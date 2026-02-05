@@ -24,17 +24,26 @@ model Address {
 
 model Club {
   id        Int     @id @default(autoincrement())
-  name      String  @db.VarChar(100)
+  name      String  @unique @db.VarChar(100)
   address   Address @relation(fields: [addressId], references: [id])
   addressId Int     @unique
   Court     Court[]
 }
 
 model Court {
-  id      Int       @id @default(autoincrement())
-  club    Club      @relation(fields: [clubId], references: [id])
-  clubId  Int
-  Booking Booking[]
+  id        Int       @id @default(autoincrement())
+  club      Club      @relation(fields: [clubId], references: [id])
+  clubId    Int
+  surface   Surface   @relation(fields: [surfaceId], references: [id])
+  indoor    Boolean   @db.Boolean
+  surfaceId Int
+  Booking   Booking[]
+}
+
+model Surface {
+  id    Int     @id @default(autoincrement())
+  name  String  @db.VarChar(30)
+  Court Court[]
 }
 
 model Booking {
@@ -62,6 +71,6 @@ model Contact {
   address      Address @relation(fields: [addressId], references: [id])
   addressId    Int     @unique
   emailAddress String  @unique @db.VarChar(50)
-  mobileNumber Int     @db.Integer
+  mobileNumber String  @db.VarChar(20)
   Person       Person?
 }

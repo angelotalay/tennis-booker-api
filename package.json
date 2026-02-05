@@ -21,6 +21,7 @@
   "dependencies": {
     "@prisma/adapter-pg": "^7.3.0",
     "@prisma/client": "^7.3.0",
+    "@prisma/language-server": "^31.4.0",
     "@types/pg": "^8.16.0",
     "cookie-parser": "^1.4.7",
     "dayjs": "^1.11.19",
@@ -60,6 +61,7 @@
     "supertest": "^7.2.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.54.0",
     "vitest": "^4.0.18"
