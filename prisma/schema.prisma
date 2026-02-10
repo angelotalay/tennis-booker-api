@@ -1,0 +1,76 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Address {
+  id           Int       @id @default(autoincrement())
+  streetName   String    @db.VarChar(50)
+  streetNumber Int       @db.Integer
+  postCode     String    @db.VarChar(10)
+  Contact      Contact[]
+  club         Club?
+}
+
+model Club {
+  id        Int     @id @default(autoincrement())
+  name      String  @unique @db.VarChar(100)
+  address   Address @relation(fields: [addressId], references: [id])
+  addressId Int     @unique
+  Court     Court[]
+}
+
+model Court {
+  id        Int       @id @default(autoincrement())
+  club      Club      @relation(fields: [clubId], references: [id])
+  clubId    Int
+  indoor    Boolean   @db.Boolean
+  surface   Surface   @relation(fields: [surfaceId], references: [id])
+  surfaceId Int
+  Booking   Booking[]
+}
+
+model Surface {
+  id    Int     @id @default(autoincrement())
+  type  String  @db.Char(20)
+  Court Court[]
+}
+
+model Booking {
+  id        Int      @id @default(autoincrement())
+  court     Court    @relation(fields: [courtId], references: [id])
+  courtId   Int
+  person    Person   @relation(fields: [personId], references: [id])
+  personId  Int
+  date      DateTime @db.Date
+  startTime DateTime @db.Timestamptz()
+  endTime   DateTime @db.Timestamptz()
+}
+
+model Person {
+  id        Int       @id @default(autoincrement())
+  firstName String
+  lastName  String
+  Booking   Booking[]
+  contact   Contact   @relation(fields: [contactId], references: [id])
+  contactId Int       @unique
+}
+
+model Contact {
+  id           Int     @id @default(autoincrement())
+  address      Address @relation(fields: [addressId], references: [id])
+  addressId    Int
+  emailAddress String  @unique @db.VarChar(50)
+  mobileNumber String  @unique @db.VarChar(15)
+  Person       Person?
+}
