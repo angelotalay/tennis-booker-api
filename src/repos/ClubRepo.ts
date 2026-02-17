@@ -1,22 +1,5 @@
-import {prisma} from "./db/client.js";
-import {Prisma} from "../../generated/prisma/client.js"
-
-/******************************************************************************
-Types
- ******************************************************************************/
-
-
-type ClubFindUniqueArgs = Prisma.Args<typeof prisma.club, "findUnique">;
-
-type ClubFindUniqueResult = Prisma.Result<
-  typeof prisma.club,
-  ClubFindUniqueArgs,
-  "findUnique"
->;
-type ClubFindManyArgs = Prisma.Args<typeof prisma.club, "findMany">
-
-type ClubFindManyResult = Prisma.Result<typeof prisma.club, ClubFindManyArgs, "findMany">
-
+import { prisma } from "./db/client.js";
+import type { Clubs, Club } from "../types/Club.js";
 
 /******************************************************************************
 Functions
@@ -25,21 +8,40 @@ Functions
 /**
  * Get one club
  */
-async function getOne({where}: {where: ClubFindUniqueArgs["where"]}): Promise<ClubFindUniqueResult> {
-    return prisma.club.findUnique({
-        where
-    })
+async function getOne(name: string): Promise<Club | null> {
+  return prisma.club.findUnique({
+    where: { name },
+    include: {
+      address: true,
+      Court: true,
+    },
+  });
 }
 
 /**
  * Get all clubs
  */
-async function getAll(): Promise<ClubFindManyResult> {
-    return prisma.club.findMany({})
+async function getAll(): Promise<Clubs[]> {
+  return prisma.club.findMany({
+    select: {
+      id: true,
+      name: true,
+      address: {
+        select: {
+          id: true,
+          streetNumber: true,
+          streetName: true,
+          postCode: true,
+        },
+      },
+    },
+    orderBy: {
+      id: "asc",
+    },
+  });
 }
 
 export default {
-    getOne, getAll
-} as const
-
-
+  getOne,
+  getAll,
+} as const;
