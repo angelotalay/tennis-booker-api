@@ -12,11 +12,9 @@ const apiRouter: Router = Router();
 const clubRouter: Router = Router();
 
 clubRouter.get("/all", ClubRoutes.getAll);
-// clubRouter.get("/:name", ClubRoutes.getOne);
-
 apiRouter.use("/club", clubRouter);
 
 /******************************************************************************
- Setup
+Exports
  ******************************************************************************/
 export default apiRouter;

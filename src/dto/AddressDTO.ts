@@ -4,6 +4,6 @@
 export interface GetAddressDTO {
   id: number;
   streetName: string;
-  streetNumber: number;
+  streetNumber: string;
   postCode: string;
 }

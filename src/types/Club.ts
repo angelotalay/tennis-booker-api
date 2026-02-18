@@ -3,7 +3,7 @@ import { Prisma } from "../../generated/prisma/client.js";
 /******************************************************************************
  Types
  ******************************************************************************/
-export type Clubs = Prisma.ClubGetPayload<{
+export type GetClubs = Prisma.ClubGetPayload<{
   select: {
     id: true;
     name: true;
@@ -18,7 +18,7 @@ export type Clubs = Prisma.ClubGetPayload<{
   };
 }>;
 
-export type Club = Prisma.ClubGetPayload<{
+export type GetClub = Prisma.ClubGetPayload<{
   include: {
     address: true;
     Court: true;

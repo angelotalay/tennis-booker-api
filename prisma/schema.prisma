@@ -16,7 +16,7 @@ datasource db {
 model Address {
   id           Int       @id @default(autoincrement())
   streetName   String    @db.VarChar(50)
-  streetNumber Int       @db.Integer
+  streetNumber String    @db.VarChar(10)
   postCode     String    @db.VarChar(10)
   Contact      Contact[]
   club         Club?
