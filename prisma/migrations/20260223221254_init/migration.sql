@@ -1,8 +1,11 @@
+-- CreateEnum
+CREATE TYPE "Surface" AS ENUM ('HARD', 'CLAY', 'GRASS', 'CARPET');
+
 -- CreateTable
 CREATE TABLE "Address" (
     "id" SERIAL NOT NULL,
     "streetName" VARCHAR(50) NOT NULL,
-    "streetNumber" INTEGER NOT NULL,
+    "streetNumber" VARCHAR(10) NOT NULL,
     "postCode" VARCHAR(10) NOT NULL,
 
     CONSTRAINT "Address_pkey" PRIMARY KEY ("id")
@@ -20,26 +23,19 @@ CREATE TABLE "Club" (
 -- CreateTable
 CREATE TABLE "Court" (
     "id" SERIAL NOT NULL,
+    "name" CHAR(30) NOT NULL DEFAULT '',
     "clubId" INTEGER NOT NULL,
+    "surface" "Surface" NOT NULL DEFAULT 'HARD',
     "indoor" BOOLEAN NOT NULL,
-    "surfaceId" INTEGER NOT NULL,
 
     CONSTRAINT "Court_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "Surface" (
-    "id" SERIAL NOT NULL,
-    "type" CHAR(20) NOT NULL,
-
-    CONSTRAINT "Surface_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Booking" (
     "id" SERIAL NOT NULL,
     "courtId" INTEGER NOT NULL,
-    "personId" INTEGER NOT NULL,
+    "userId" INTEGER NOT NULL,
     "date" DATE NOT NULL,
     "startTime" TIMESTAMPTZ NOT NULL,
     "endTime" TIMESTAMPTZ NOT NULL,
@@ -48,13 +44,13 @@ CREATE TABLE "Booking" (
 );
 
 -- CreateTable
-CREATE TABLE "Person" (
+CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
     "firstName" TEXT NOT NULL,
     "lastName" TEXT NOT NULL,
     "contactId" INTEGER NOT NULL,
 
-    CONSTRAINT "Person_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -68,13 +64,13 @@ CREATE TABLE "Contact" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Club_name_key" ON "Club"("name");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Club_addressId_key" ON "Club"("addressId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Court_surfaceId_key" ON "Court"("surfaceId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Person_contactId_key" ON "Person"("contactId");
+CREATE UNIQUE INDEX "User_contactId_key" ON "User"("contactId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Contact_emailAddress_key" ON "Contact"("emailAddress");
@@ -89,16 +85,13 @@ ALTER TABLE "Club" ADD CONSTRAINT "Club_addressId_fkey" FOREIGN KEY ("addressId"
 ALTER TABLE "Court" ADD CONSTRAINT "Court_clubId_fkey" FOREIGN KEY ("clubId") REFERENCES "Club"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Court" ADD CONSTRAINT "Court_surfaceId_fkey" FOREIGN KEY ("surfaceId") REFERENCES "Surface"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "Booking" ADD CONSTRAINT "Booking_courtId_fkey" FOREIGN KEY ("courtId") REFERENCES "Court"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Booking" ADD CONSTRAINT "Booking_personId_fkey" FOREIGN KEY ("personId") REFERENCES "Person"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Booking" ADD CONSTRAINT "Booking_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Person" ADD CONSTRAINT "Person_contactId_fkey" FOREIGN KEY ("contactId") REFERENCES "Contact"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "User" ADD CONSTRAINT "User_contactId_fkey" FOREIGN KEY ("contactId") REFERENCES "Contact"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Contact" ADD CONSTRAINT "Contact_addressId_fkey" FOREIGN KEY ("addressId") REFERENCES "Address"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

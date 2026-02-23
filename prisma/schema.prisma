@@ -51,14 +51,14 @@ model Booking {
   id        Int      @id @default(autoincrement())
   court     Court    @relation(fields: [courtId], references: [id])
   courtId   Int
-  person    Person   @relation(fields: [personId], references: [id])
-  personId  Int
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
   date      DateTime @db.Date
   startTime DateTime @db.Timestamptz()
   endTime   DateTime @db.Timestamptz()
 }
 
-model Person {
+model User {
   id        Int       @id @default(autoincrement())
   firstName String
   lastName  String
@@ -73,5 +73,5 @@ model Contact {
   addressId    Int
   emailAddress String  @unique @db.VarChar(50)
   mobileNumber String  @unique @db.VarChar(15)
-  Person       Person?
+  User         User?
 }

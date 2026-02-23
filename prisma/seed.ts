@@ -6,7 +6,7 @@ const adapter = new PrismaPg({
 });
 const prisma = new PrismaClient({ adapter });
 
-const utc = (iso: string) => new Date(iso); // ISO with Z
+const utc = (iso: string) => new Date(iso);
 const asDateOnlyUTC = (isoDate: string) => new Date(`${isoDate}T00:00:00.000Z`);
 
 type SurfaceType = "HARD" | "CLAY" | "GRASS" | "CARPET";
@@ -19,7 +19,7 @@ type ClubSeed = {
   courts: CourtSeed[];
 };
 
-type PersonSeed = {
+type UserSeed = {
   firstName: string;
   lastName: string;
   contact: {
@@ -31,11 +31,11 @@ type PersonSeed = {
 
 async function main() {
   // ---------------------------
-  // 0) Clear existing data (order matters because of FKs)
+  // 0) Clear existing data
   // ---------------------------
   await prisma.$transaction([
     prisma.booking.deleteMany(),
-    prisma.person.deleteMany(),
+    prisma.user.deleteMany(),
     prisma.contact.deleteMany(),
     prisma.court.deleteMany(),
     prisma.club.deleteMany(),
@@ -96,19 +96,17 @@ async function main() {
         address: { create: club.address },
       },
       update: {
-        // addressId is unique so this updates the same Address row (good)
         address: { update: club.address },
       },
       include: { courts: true, address: true },
     });
 
-    // Ensure courts align with seed by recreating them for this club
-    await prisma.court.deleteMany({ where: { clubId: upsertedClub.id } });
+    await prisma.court.deleteMany({
+      where: { clubId: upsertedClub.id },
+    });
 
     await prisma.court.createMany({
       data: club.courts.map((c, idx) => ({
-        // NOTE: @db.Char(30) will be padded by Postgres; that's expected with CHAR.
-        // If you want to avoid padding, change to @db.VarChar(30).
         name: `Court ${idx + 1}`,
         clubId: upsertedClub.id,
         indoor: c.indoor,
@@ -118,9 +116,9 @@ async function main() {
   }
 
   // ---------------------------
-  // 2) Seed Contacts + People
+  // 2) Seed Contacts + Users
   // ---------------------------
-  const peopleToSeed: PersonSeed[] = [
+  const usersToSeed: UserSeed[] = [
     {
       firstName: "Angelo",
       lastName: "Talay",
@@ -188,31 +186,31 @@ async function main() {
     },
   ];
 
-  for (const p of peopleToSeed) {
+  for (const u of usersToSeed) {
     const contact = await prisma.contact.upsert({
-      where: { emailAddress: p.contact.emailAddress },
+      where: { emailAddress: u.contact.emailAddress },
       create: {
-        emailAddress: p.contact.emailAddress,
-        mobileNumber: p.contact.mobileNumber,
-        address: { create: p.contact.address },
+        emailAddress: u.contact.emailAddress,
+        mobileNumber: u.contact.mobileNumber,
+        address: { create: u.contact.address },
       },
       update: {
-        mobileNumber: p.contact.mobileNumber,
-        address: { update: p.contact.address },
+        mobileNumber: u.contact.mobileNumber,
+        address: { update: u.contact.address },
       },
       include: { address: true },
     });
 
-    await prisma.person.upsert({
+    await prisma.user.upsert({
       where: { contactId: contact.id },
       create: {
-        firstName: p.firstName,
-        lastName: p.lastName,
+        firstName: u.firstName,
+        lastName: u.lastName,
         contactId: contact.id,
       },
       update: {
-        firstName: p.firstName,
-        lastName: p.lastName,
+        firstName: u.firstName,
+        lastName: u.lastName,
       },
     });
   }
@@ -220,49 +218,55 @@ async function main() {
   // ---------------------------
   // 3) Seed Bookings
   // ---------------------------
-  const courts = await prisma.court.findMany({ orderBy: { id: "asc" } });
+  const courts = await prisma.court.findMany({
+    orderBy: { id: "asc" },
+  });
+
+  const users = await prisma.user.findMany({
+    orderBy: { id: "asc" },
+  });
+
   if (courts.length < 3)
     throw new Error(`Expected >= 3 courts, got ${courts.length}`);
 
-  const people = await prisma.person.findMany({ orderBy: { id: "asc" } });
-  if (people.length < 5)
-    throw new Error(`Expected >= 5 people, got ${people.length}`);
+  if (users.length < 5)
+    throw new Error(`Expected >= 5 users, got ${users.length}`);
 
   const [courtA, courtB, courtC] = courts;
-  const [p1, p2, p3, p4, p5] = people;
+  const [u1, u2, u3, u4, u5] = users;
 
   const bookingsToSeed = [
     {
       courtId: courtA.id,
-      personId: p1.id,
+      userId: u1.id,
       date: asDateOnlyUTC("2026-02-10"),
       startTime: utc("2026-02-10T18:00:00.000Z"),
       endTime: utc("2026-02-10T19:00:00.000Z"),
     },
     {
       courtId: courtA.id,
-      personId: p2.id,
+      userId: u2.id,
       date: asDateOnlyUTC("2026-02-10"),
       startTime: utc("2026-02-10T19:00:00.000Z"),
       endTime: utc("2026-02-10T20:00:00.000Z"),
     },
     {
       courtId: courtB.id,
-      personId: p3.id,
+      userId: u3.id,
       date: asDateOnlyUTC("2026-02-10"),
       startTime: utc("2026-02-10T17:30:00.000Z"),
       endTime: utc("2026-02-10T18:30:00.000Z"),
     },
     {
       courtId: courtC.id,
-      personId: p4.id,
+      userId: u4.id,
       date: asDateOnlyUTC("2026-02-11"),
       startTime: utc("2026-02-11T07:00:00.000Z"),
       endTime: utc("2026-02-11T08:00:00.000Z"),
     },
     {
       courtId: courtC.id,
-      personId: p5.id,
+      userId: u5.id,
       date: asDateOnlyUTC("2026-02-11"),
       startTime: utc("2026-02-11T18:00:00.000Z"),
       endTime: utc("2026-02-11T19:30:00.000Z"),
@@ -279,14 +283,14 @@ async function main() {
     clubCount,
     courtCount,
     contactCount,
-    personCount,
+    userCount,
     bookingCount,
   ] = await prisma.$transaction([
     prisma.address.count(),
     prisma.club.count(),
     prisma.court.count(),
     prisma.contact.count(),
-    prisma.person.count(),
+    prisma.user.count(),
     prisma.booking.count(),
   ]);
 
@@ -296,7 +300,7 @@ async function main() {
     clubs: clubCount,
     courts: courtCount,
     contacts: contactCount,
-    people: personCount,
+    users: userCount,
     bookings: bookingCount,
   });
 }
