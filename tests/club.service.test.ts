@@ -4,7 +4,7 @@ import ClubService, {
   toGetClubsResponseDTO,
 } from "../src/service/ClubService.js";
 import ClubRepo from "../src/repos/ClubRepo.js";
-import type { GetClubs } from "../src/types/Club.js";
+import type { GetClubs } from "../src/types/ClubTypes.js";
 
 /******************************************************************************
  Setup
@@ -18,6 +18,9 @@ vi.mock("repo/ClubRepo.js");
  scenarios (i.e. a failed database connection).
  ******************************************************************************/
 
+/**
+ * Tests all service functions related to the club model
+ */
 describe("club.service", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
@@ -72,6 +75,9 @@ describe("club.service", () => {
   });
 });
 
+/**
+ * Tests the DTO mapping functions
+ */
 describe("toGetClubsResponseDTO (Mapper", () => {
   it("maps a GetClubs row into GetClubsResponseDTO", () => {
     const row: GetClubs = {

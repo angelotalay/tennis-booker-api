@@ -21,6 +21,6 @@ export type GetClubs = Prisma.ClubGetPayload<{
 export type GetClub = Prisma.ClubGetPayload<{
   include: {
     address: true;
-    Court: true;
+    courts: true;
   };
 }>;

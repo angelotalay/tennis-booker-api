@@ -1,20 +1,26 @@
 import type { GetAddressDTO } from "./AddressDTO.js";
-import type { GetCourtDTO } from "./CourtDTO.js";
 
 /******************************************************************************
  Types
  ******************************************************************************/
 
+// ----------------------- RequestDTO --------------------------------- //
+
 export interface GetClubRequestDTO {
-  id?: number;
-  name: string;
+  id: number;
 }
 
+// ----------------------- ResponseDTO --------------------------------- //
+
 export interface GetClubResponseDTO {
-  id: Number;
+  id: number;
   name: string;
   address?: GetAddressDTO;
-  courts?: GetCourtDTO[];
+  courts?: {
+    id: number;
+    name: string;
+    indoor: boolean;
+  }[];
 }
 
 export interface GetClubsResponseDTO {

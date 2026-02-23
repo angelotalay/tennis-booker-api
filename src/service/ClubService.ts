@@ -1,7 +1,11 @@
-import ClubRepo from "../repos/ClubRepo.js";
-import type { GetClubsResponseDTO } from "../dto/ClubDTO.js";
+import ClubRepo from "@/src/repos/ClubRepo.js";
+import type {
+  GetClubRequestDTO,
+  GetClubResponseDTO,
+  GetClubsResponseDTO,
+} from "../dto/ClubDTO.js";
 
-import type { GetClubs } from "../types/Club.js";
+import type { GetClub, GetClubs } from "../types/ClubTypes.js";
 
 /******************************************************************************
  Functions
@@ -21,6 +25,26 @@ export function toGetClubsResponseDTO(row: GetClubs): GetClubsResponseDTO {
   };
 }
 
+export function toGetClubResponseDTO(club: GetClub): GetClubResponseDTO {
+  return {
+    id: club.id,
+    name: club.name,
+    address: {
+      id: club.address.id,
+      streetNumber: club.address.streetNumber,
+      streetName: club.address.streetName,
+      postCode: club.address.postCode,
+    },
+    courts: club.courts.map((court) => {
+      return {
+        id: court.id,
+        name: court.name,
+        indoor: court.indoor,
+      };
+    }),
+  };
+}
+
 /**
  * Get all clubs
  */
@@ -30,6 +54,20 @@ async function getAllClubs(): Promise<GetClubsResponseDTO[]> {
   return allClubs.map(toGetClubsResponseDTO);
 }
 
+/**
+ * Get one club using the id
+ */
+async function getClub(
+  dto: GetClubRequestDTO,
+): Promise<GetClubResponseDTO | null> {
+  const club = await ClubRepo.getOne({ ...dto });
+  if (!club) {
+    return null;
+  }
+  return toGetClubResponseDTO(club);
+}
+
 export default {
   getAllClubs,
+  getClub,
 } as const;

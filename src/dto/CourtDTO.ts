@@ -4,8 +4,18 @@ import type { GetSurfaceDTO } from "./SurfaceDTO.js";
  Types
  ******************************************************************************/
 
-export interface GetCourtDTO {
+// ----------------------- RequestDTO --------------------------------- //
+
+export type GetCourtsRequestDTO = { clubId: number } | { clubId?: never };
+
+export type GetCourtRequestDTO = { courtId: number };
+
+// ----------------------- ResponseDTO --------------------------------- //
+
+export interface GetCourtResponseDTO {
   id: number;
+  name: string;
   indoor: boolean;
-  surface: Partial<GetSurfaceDTO>;
+  surface: string;
+  clubId: number;
 }

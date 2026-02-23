@@ -1,5 +1,5 @@
 import { prisma } from "../lib/client.js";
-import type { GetClubs, GetClub } from "../types/Club.js";
+import type { GetClubs, GetClub } from "../types/ClubTypes.js";
 
 /******************************************************************************
 Functions
@@ -8,12 +8,12 @@ Functions
 /**
  * Get one club
  */
-async function getOne(name: string): Promise<GetClub | null> {
+async function getOne({ id }: { id: number }): Promise<GetClub | null> {
   return prisma.club.findUnique({
-    where: { name },
+    where: { id },
     include: {
       address: true,
-      Court: true,
+      courts: true,
     },
   });
 }

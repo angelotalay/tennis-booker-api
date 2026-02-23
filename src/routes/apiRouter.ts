@@ -11,7 +11,8 @@ const apiRouter: Router = Router();
 
 const clubRouter: Router = Router();
 
-clubRouter.get("/all", ClubRoutes.getAll);
+clubRouter.get("/", ClubRoutes.getAll);
+clubRouter.get("/:id", ClubRoutes.getOne);
 apiRouter.use("/club", clubRouter);
 
 /******************************************************************************
