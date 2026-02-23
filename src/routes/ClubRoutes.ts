@@ -1,11 +1,12 @@
 import type { Request, Response } from "express";
 
+import HttpStatusCodes from "../common/constants/HttpStatusCodes.js";
 import ClubService from "../service/ClubService.js";
 import type {
   GetClubResponseDTO,
   GetClubsResponseDTO,
 } from "../dto/ClubDTO.js";
-import HttpStatusCodes from "../common/constants/HttpStatusCodes.js";
+import type { GetClubParams } from "@/src/types/ClubTypes.js";
 
 /******************************************************************************
  Functions
@@ -24,11 +25,8 @@ async function getAll(_: Request, res: Response<GetClubsResponseDTO[]>) {
  * Get one club using ID
  * @route GET /api/club/:id
  */
-async function getOne(req: Request, res: Response<GetClubResponseDTO>) {
-  // validation of request will be done later
-  // We parse id into number
-  const { id: idString } = req.params;
-  const id: number = Number(idString);
+async function getOne(_: Request, res: Response<GetClubResponseDTO>) {
+  const { id } = res.locals.params as GetClubParams;
   const club: GetClubResponseDTO | null = await ClubService.getClub({ id });
   if (!club) {
     return res.sendStatus(HttpStatusCodes.NOT_FOUND);

@@ -3,13 +3,6 @@ import type { GetAddressDTO } from "./AddressDTO.js";
 /******************************************************************************
  Types
  ******************************************************************************/
-
-// ----------------------- RequestDTO --------------------------------- //
-
-export interface GetClubRequestDTO {
-  id: number;
-}
-
 // ----------------------- ResponseDTO --------------------------------- //
 
 export interface GetClubResponseDTO {

@@ -1,9 +1,6 @@
 import CourtRepo from "../repos/CourtRepo.js";
-import type {
-  GetCourtRequestDTO,
-  GetCourtsRequestDTO,
-} from "../dto/CourtDTO.js";
-import type { GetCourts } from "../types/CourtTypes.js";
+import type { GetCourtsRequestDTO } from "../dto/CourtDTO.js";
+import type { GetCourtParams, GetCourts } from "../types/CourtTypes.js";
 import type { GetCourtResponseDTO } from "../dto/CourtDTO.js";
 
 /******************************************************************************
@@ -21,18 +18,10 @@ export function toGetCourtResponseDTO(court: GetCourts): GetCourtResponseDTO {
 }
 
 /**
- * Get all courts for a particular club
- */
-// async function getAllCourtsByClub(dto: GetCourts): Promise<GetCourts>  {
-//     const allCourts = await CourtRepo.getAll(dto);
-//     return allCourts
-// }
-
-/**
  * Get all courts or all courts for a club using the clubId
  * @param dto - Data transfer object that is either empty or contains the id of a club
  */
-async function getAllCourts(dto: GetCourtsRequestDTO) {
+async function getAllCourts(dto: GetCourtsRequestDTO = {}) {
   const allCourts = await CourtRepo.getAll(dto);
   return allCourts.map(toGetCourtResponseDTO);
 }
@@ -42,7 +31,7 @@ async function getAllCourts(dto: GetCourtsRequestDTO) {
  */
 
 async function getCourt(
-  dto: GetCourtRequestDTO,
+  dto: GetCourtParams,
 ): Promise<GetCourtResponseDTO | null> {
   const court = await CourtRepo.getOne(dto);
   if (!court) {
@@ -53,4 +42,5 @@ async function getCourt(
 
 export default {
   getAllCourts,
+  getCourt,
 } as const;

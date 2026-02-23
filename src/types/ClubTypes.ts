@@ -1,8 +1,12 @@
 import { Prisma } from "../../generated/prisma/client.js";
+import { z } from "zod";
+import type ClubSchema from "@/src/validation/ClubSchema.js";
 
 /******************************************************************************
  Types
  ******************************************************************************/
+
+// ----------------------- Prisma return types --------------------------------- //
 export type GetClubs = Prisma.ClubGetPayload<{
   select: {
     id: true;
@@ -24,3 +28,6 @@ export type GetClub = Prisma.ClubGetPayload<{
     courts: true;
   };
 }>;
+
+// ----------------------- Request types --------------------------------- //
+export type GetClubParams = z.infer<typeof ClubSchema.clubParamsSchema>;

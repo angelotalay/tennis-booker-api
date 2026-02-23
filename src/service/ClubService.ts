@@ -1,11 +1,10 @@
 import ClubRepo from "@/src/repos/ClubRepo.js";
 import type {
-  GetClubRequestDTO,
   GetClubResponseDTO,
   GetClubsResponseDTO,
 } from "../dto/ClubDTO.js";
 
-import type { GetClub, GetClubs } from "../types/ClubTypes.js";
+import type { GetClub, GetClubParams, GetClubs } from "../types/ClubTypes.js";
 
 /******************************************************************************
  Functions
@@ -57,9 +56,7 @@ async function getAllClubs(): Promise<GetClubsResponseDTO[]> {
 /**
  * Get one club using the id
  */
-async function getClub(
-  dto: GetClubRequestDTO,
-): Promise<GetClubResponseDTO | null> {
+async function getClub(dto: GetClubParams): Promise<GetClubResponseDTO | null> {
   const club = await ClubRepo.getOne({ ...dto });
   if (!club) {
     return null;

@@ -1,5 +1,3 @@
-import type { GetSurfaceDTO } from "./SurfaceDTO.js";
-
 /******************************************************************************
  Types
  ******************************************************************************/
@@ -7,8 +5,6 @@ import type { GetSurfaceDTO } from "./SurfaceDTO.js";
 // ----------------------- RequestDTO --------------------------------- //
 
 export type GetCourtsRequestDTO = { clubId: number } | { clubId?: never };
-
-export type GetCourtRequestDTO = { courtId: number };
 
 // ----------------------- ResponseDTO --------------------------------- //
 
