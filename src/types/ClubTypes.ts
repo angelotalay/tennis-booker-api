@@ -1,6 +1,6 @@
 import { Prisma } from "../../generated/prisma/client.js";
 import { z } from "zod";
-import type ClubSchema from "@/src/validation/ClubSchema.js";
+import ClubSchema from "@/src/validation/ClubSchema.js";
 
 /******************************************************************************
  Types
