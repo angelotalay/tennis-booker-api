@@ -26,7 +26,9 @@ async function getAll(req: Request, res: Response) {
  */
 async function getOne(req: Request, res: Response) {
   const { courtId } = res.locals.params as GetCourtParams;
-  const court = await CourtService.getCourt({ courtId });
+  const court: GetCourtResponseDTO | null = await CourtService.getCourt({
+    courtId,
+  });
   if (!court) {
     res.sendStatus(HttpStatusCodes.NOT_FOUND);
   }

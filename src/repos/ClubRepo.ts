@@ -6,11 +6,12 @@ Functions
  ******************************************************************************/
 
 /**
- * Get one club
+ * Get one club including th
+ * @param dto -
  */
-async function getOne({ id }: { id: number }): Promise<GetClub | null> {
+async function getOne(dto: { id: number }): Promise<GetClub | null> {
   return prisma.club.findUnique({
-    where: { id },
+    where: { id: dto.id },
     include: {
       address: true,
       courts: true,
