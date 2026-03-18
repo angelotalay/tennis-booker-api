@@ -1,7 +1,12 @@
 {
   "extends": "@tsconfig/node24/tsconfig.json",
   "compilerOptions": {
-    "paths": { "@/*": ["./*"] },
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@generated/*": ["generated/*"],
+      "@tests/*": ["tests/*"]
+    },
     "esModuleInterop": true,
     "skipLibCheck": true,
     "allowJs": true,
@@ -10,5 +15,5 @@
     "isolatedModules": true,
     "verbatimModuleSyntax": true
   },
-  "include": ["src", "generated"]
+  "include": ["src", "generated", "tests"]
 }
