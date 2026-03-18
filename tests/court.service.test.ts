@@ -100,6 +100,7 @@ describe("getCourt", () => {
       { clubId: 1 },
     );
 
+    expect(getOneSpy).toHaveBeenCalledTimes(1);
     expect(courtResult).toEqual({
       id: 1,
       name: "Court 1",

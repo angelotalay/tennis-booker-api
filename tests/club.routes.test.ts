@@ -63,6 +63,7 @@ describe("club.routes", () => {
 
     const req = {} as Request;
     const res = makeRes<GetClubsResponseDTO[]>();
+
     await ClubRoutes.getAll(req, res);
 
     expect(ClubService.getAllClubs).toHaveBeenCalledTimes(1);
@@ -73,8 +74,10 @@ describe("club.routes", () => {
   it("getOne: Returns one club, returns 200 status", async () => {
     vi.mocked(ClubService.getClub).mockResolvedValue(CLUB);
 
-    const req = { params: { id: "1" } } as unknown as Request;
-    const res = makeRes<GetClubResponseDTO>();
+    const req = {} as Request;
+    const res = makeRes<GetClubResponseDTO>({
+      params: { id: 1 },
+    });
 
     await ClubRoutes.getOne(req, res);
 
@@ -87,8 +90,10 @@ describe("club.routes", () => {
   it("getOne: No club found, returns 404", async () => {
     vi.mocked(ClubService.getClub).mockResolvedValue(null);
 
-    const req = { params: { id: "99" } } as unknown as Request;
-    const res = makeRes<GetClubResponseDTO>();
+    const req = {} as Request;
+    const res = makeRes<GetClubResponseDTO>({
+      params: { id: 99 },
+    });
 
     await ClubRoutes.getOne(req, res);
 

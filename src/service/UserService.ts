@@ -1,8 +1,4 @@
-import UserRepo from "@/src/repos/UserRepo.js";
-import type { GetUserParams } from "@/src/types/UserTypes.js";
-
-import UserSchema from "@/src/validation/UserSchema.js";
-import { GetUser } from "@/src/types/UserTypes.js";
+import type { GetUser } from "@/src/types/UserTypes.js";
 
 /******************************************************************************
  Functions
@@ -18,12 +14,8 @@ function toGetUserResponseDTO(user: GetUser) {
   };
 }
 
-/**
- *
- * @param dto
- */
-async function getUser(dto: GetUserParams) {
-  const user: GetUser | null = await UserRepo.getOne(dto);
-  if (!user) return null;
-  return toGetUserResponseDTO(user);
-}
+/******************************************************************************
+ Exports
+ ******************************************************************************/
+
+export default toGetUserResponseDTO;
