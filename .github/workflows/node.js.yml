@@ -29,6 +29,8 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Generate Prisma client
+        run: pnpm prisma generate
       - run: pnpm typecheck
 
   test:
@@ -41,6 +43,8 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Generate Prisma client
+        run: pnpm prisma generate
       - run: pnpm test:unit
 
   build:
@@ -53,4 +57,6 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Generate Prisma client
+        run: pnpm prisma generate
       - run: pnpm build
