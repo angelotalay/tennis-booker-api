@@ -33,6 +33,3 @@ export type GetClub = Prisma.ClubGetPayload<{
 export type GetClubParams = z.infer<typeof ClubSchema.clubParamsSchema>;
 
 // ----------------------- DTO types --------------------------------- //
-export interface GetClubDTO = {
-  id: number;
-}
