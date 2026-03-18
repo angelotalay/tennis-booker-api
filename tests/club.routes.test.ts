@@ -1,19 +1,17 @@
 import { it, vi, describe, expect, beforeEach } from "vitest";
 import type { Request } from "express";
 
-import type {
-  GetClubResponseDTO,
-  GetClubsResponseDTO,
-} from "../src/dto/ClubDTO.js";
-import ClubService from "../src/service/ClubService.js";
+import type { GetClubResponseDTO, GetClubsResponseDTO } from "@/dto/ClubDTO.js";
+import ClubService from "@/service/ClubService.js";
 import makeRes from "./common/makeRes.js";
-import ClubRoutes from "../src/routes/ClubRoutes.js";
-import HttpStatusCodes from "../src/common/constants/HttpStatusCodes.js";
+import ClubRoutes from "@/routes/ClubRoutes.js";
+import HttpStatusCodes from "@/common/constants/HttpStatusCodes.js";
+import ClubBuilder from "@tests/common/builders/ClubBuilder.js";
 
 /******************************************************************************
  Setup
  ******************************************************************************/
-vi.mock("../src/service/ClubService.js", () => ({
+vi.mock("@/service/ClubService.js", () => ({
   default: {
     getAllClubs: vi.fn(),
     getClub: vi.fn(),
@@ -23,16 +21,7 @@ vi.mock("../src/service/ClubService.js", () => ({
 /******************************************************************************
  Constants
  ******************************************************************************/
-const CLUB: GetClubResponseDTO = {
-  id: 1,
-  name: "Birmingham Central Tennis",
-  address: {
-    id: 1,
-    streetNumber: "12",
-    streetName: "High Street",
-    postCode: "B1 1AA",
-  },
-};
+const CLUB: GetClubResponseDTO = new ClubBuilder.ClubDetailBuilder().build();
 
 const CLUBS: GetClubsResponseDTO[] = [
   {
@@ -49,9 +38,6 @@ const CLUBS: GetClubsResponseDTO[] = [
 
 /******************************************************************************
  Tests
- IMPORTANT: Following TypeScript best practices, we test all scenarios that
- can be triggered by a user under normal circumstances. Not all theoretically
- scenarios (i.e. a failed database connection).
  ******************************************************************************/
 
 describe("club.routes", () => {
@@ -74,8 +60,9 @@ describe("club.routes", () => {
     vi.mocked(ClubService.getClub).mockResolvedValue(CLUB);
 
     const req = { params: { id: "1" } } as unknown as Request;
-    const res = makeRes<GetClubResponseDTO>();
-
+    const res = makeRes<GetClubResponseDTO>({
+      params: { id: 1 },
+    });
     await ClubRoutes.getOne(req, res);
 
     expect(ClubService.getClub).toHaveBeenCalledTimes(1);
@@ -88,8 +75,9 @@ describe("club.routes", () => {
     vi.mocked(ClubService.getClub).mockResolvedValue(null);
 
     const req = { params: { id: "99" } } as unknown as Request;
-    const res = makeRes<GetClubResponseDTO>();
-
+    const res = makeRes<GetClubResponseDTO>({
+      params: { id: 99 },
+    });
     await ClubRoutes.getOne(req, res);
 
     expect(ClubService.getClub).toHaveBeenCalledTimes(1);

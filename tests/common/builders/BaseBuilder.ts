@@ -6,7 +6,7 @@ type EntityWithId = {
   id: number;
 };
 
-export default abstract class BaseBuilder<T extends EntityWithId> {
+abstract class BaseBuilder<T extends EntityWithId> {
   protected entity: T;
 
   protected constructor(entity: T) {
@@ -22,3 +22,9 @@ export default abstract class BaseBuilder<T extends EntityWithId> {
     return structuredClone(this.entity);
   }
 }
+
+/******************************************************************************
+Export
+ ******************************************************************************/
+
+export default BaseBuilder;

@@ -1,20 +1,21 @@
 import { describe, beforeEach, vi, it, expect } from "vitest";
 
 import ClubService, {
+  toGetClubResponseDTO,
   toGetClubsResponseDTO,
-} from "../src/service/ClubService.js";
-import ClubRepo from "../src/repos/ClubRepo.js";
-import type { GetClubs } from "../src/types/ClubTypes.js";
+} from "@/service/ClubService.js";
+import ClubRepo from "@/repos/ClubRepo.js";
+import ClubBuilder from "@tests/common/builders/ClubBuilder.js";
 
 /******************************************************************************
  Setup
  ******************************************************************************/
-vi.mock("repo/ClubRepo.js");
+vi.mock("@/repos/ClubRepo.js");
 
 /******************************************************************************
  Tests
  IMPORTANT: Following TypeScript best practices, we test all scenarios that
- can be triggered by a user under normal circumstances. Not all theoretically
+ can be triggered by a user under normal circumstances. Not all theoretical
  scenarios (i.e. a failed database connection).
  ******************************************************************************/
 
@@ -23,12 +24,36 @@ vi.mock("repo/ClubRepo.js");
  */
 describe("club.service", () => {
   beforeEach(() => {
-    vi.restoreAllMocks();
+    vi.clearAllMocks();
   });
 
   describe("getAllClubs", () => {
-    it("It should return a list of clubs matched to DTOs", async () => {
+    it("should return a list of clubs mapped to DTOs", async () => {
       const mockClubsFromRepo = [
+        new ClubBuilder.ClubListBuilder()
+          .withId(1)
+          .withName("Tennis Center")
+          .withAddressId(10)
+          .withStreetNumber("1")
+          .withStreetName("Ace Ave")
+          .withPostCode("SW1")
+          .build(),
+        new ClubBuilder.ClubListBuilder()
+          .withId(2)
+          .withName("Tennis Centre 2")
+          .withAddressId(9)
+          .withStreetNumber("2")
+          .withStreetName("Shank Land")
+          .withPostCode("SW2")
+          .build(),
+      ];
+
+      vi.mocked(ClubRepo.getAll).mockResolvedValue(mockClubsFromRepo);
+
+      const clubsResult = await ClubService.getAllClubs();
+
+      expect(clubsResult).toHaveLength(2);
+      expect(clubsResult).toEqual([
         {
           id: 1,
           name: "Tennis Center",
@@ -49,28 +74,88 @@ describe("club.service", () => {
             postCode: "SW2",
           },
         },
-      ];
+      ]);
+      expect(ClubRepo.getAll).toHaveBeenCalledTimes(1);
+    });
 
-      // Tell the mock Repo to return our fake data
-      // vi.mocked doesn't apply the mockResolvedValue, so use spyOn instead
-      const getAllSpy = vi
-        .spyOn(ClubRepo, "getAll")
-        .mockResolvedValue(mockClubsFromRepo);
+    it("should return an empty array when the repo returns no clubs", async () => {
+      vi.mocked(ClubRepo.getAll).mockResolvedValue([]);
 
       const clubsResult = await ClubService.getAllClubs();
 
-      expect(clubsResult).toHaveLength(2);
-      expect(clubsResult[0]).toEqual({
+      expect(clubsResult).toEqual([]);
+      expect(ClubRepo.getAll).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("getClub", () => {
+    it("should return a mapped club DTO when a club is found", async () => {
+      const mockClubFromRepo = new ClubBuilder.ClubDetailBuilder()
+        .withId(1)
+        .withName("Birmingham Central Tennis")
+        .withAddressId(10)
+        .withAddress({
+          id: 10,
+          streetNumber: "12",
+          streetName: "High Street",
+          postCode: "B1 1AA",
+        })
+        .withCourts([
+          {
+            id: 101,
+            name: "Court 1",
+            clubId: 1,
+            surface: "HARD",
+            indoor: false,
+          },
+          {
+            id: 102,
+            name: "Court 2",
+            clubId: 1,
+            surface: "CLAY",
+            indoor: true,
+          },
+        ])
+        .build();
+
+      vi.mocked(ClubRepo.getOne).mockResolvedValue(mockClubFromRepo);
+
+      const clubResult = await ClubService.getClub({ id: 1 });
+
+      expect(clubResult).toEqual({
         id: 1,
-        name: "Tennis Center",
+        name: "Birmingham Central Tennis",
         address: {
           id: 10,
-          streetNumber: "1",
-          streetName: "Ace Ave",
-          postCode: "SW1",
+          streetNumber: "12",
+          streetName: "High Street",
+          postCode: "B1 1AA",
         },
+        courts: [
+          {
+            id: 101,
+            name: "Court 1",
+            indoor: false,
+          },
+          {
+            id: 102,
+            name: "Court 2",
+            indoor: true,
+          },
+        ],
       });
-      expect(ClubRepo.getAll).toHaveBeenCalledTimes(1);
+      expect(ClubRepo.getOne).toHaveBeenCalledTimes(1);
+      expect(ClubRepo.getOne).toHaveBeenCalledWith({ id: 1 });
+    });
+
+    it("should return null when no club is found", async () => {
+      vi.mocked(ClubRepo.getOne).mockResolvedValue(null);
+
+      const clubResult = await ClubService.getClub({ id: 999 });
+
+      expect(clubResult).toBeNull();
+      expect(ClubRepo.getOne).toHaveBeenCalledTimes(1);
+      expect(ClubRepo.getOne).toHaveBeenCalledWith({ id: 999 });
     });
   });
 });
@@ -78,29 +163,75 @@ describe("club.service", () => {
 /**
  * Tests the DTO mapping functions
  */
-describe("toGetClubsResponseDTO (Mapper", () => {
-  it("maps a GetClubs row into GetClubsResponseDTO", () => {
-    const row: GetClubs = {
-      id: 1,
-      name: "Birmingham Central",
-      address: {
-        id: 10,
-        streetNumber: "12",
-        streetName: "High Street",
-        postCode: "B1 1AA",
-      },
-    };
+describe("club.service mappers", () => {
+  describe("toGetClubsResponseDTO", () => {
+    it("maps a GetClubs row into GetClubsResponseDTO", () => {
+      const row = new ClubBuilder.ClubListBuilder()
+        .withId(1)
+        .withName("Birmingham Central")
+        .withAddressId(10)
+        .withStreetNumber("12")
+        .withStreetName("High Street")
+        .withPostCode("B1 1AA")
+        .build();
 
-    const dto = toGetClubsResponseDTO(row);
-    expect(dto).toEqual({
-      id: 1,
-      name: "Birmingham Central",
-      address: {
-        id: 10,
-        streetNumber: "12",
-        streetName: "High Street",
-        postCode: "B1 1AA",
-      },
+      const dto = toGetClubsResponseDTO(row);
+
+      expect(dto).toEqual({
+        id: 1,
+        name: "Birmingham Central",
+        address: {
+          id: 10,
+          streetNumber: "12",
+          streetName: "High Street",
+          postCode: "B1 1AA",
+        },
+      });
+    });
+  });
+
+  describe("toGetClubResponseDTO", () => {
+    it("maps a GetClub row into GetClubResponseDTO", () => {
+      const club = new ClubBuilder.ClubDetailBuilder()
+        .withId(1)
+        .withName("Birmingham Central Tennis")
+        .withAddressId(10)
+        .withAddress({
+          id: 10,
+          streetNumber: "12",
+          streetName: "High Street",
+          postCode: "B1 1AA",
+        })
+        .withCourts([
+          {
+            id: 101,
+            name: "Court 1",
+            clubId: 1,
+            surface: "HARD",
+            indoor: false,
+          },
+        ])
+        .build();
+
+      const dto = toGetClubResponseDTO(club);
+
+      expect(dto).toEqual({
+        id: 1,
+        name: "Birmingham Central Tennis",
+        address: {
+          id: 10,
+          streetNumber: "12",
+          streetName: "High Street",
+          postCode: "B1 1AA",
+        },
+        courts: [
+          {
+            id: 101,
+            name: "Court 1",
+            indoor: false,
+          },
+        ],
+      });
     });
   });
 });

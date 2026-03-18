@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 
 import CourtRepo from "../src/repos/CourtRepo.js";
 import CourtService, {
@@ -8,56 +8,45 @@ import CourtService, {
 import type { CourtModel } from "../generated/prisma/models/Court.js";
 import type { GetCourt, GetCourts } from "@/types/CourtTypes.js";
 import type { GetCourtResponseDTO } from "@/dto/CourtDTO.js";
+import CourtBuilder from "@tests/common/builders/CourtBuilder.js";
 
 vi.mock("../src/repos/CourtRepo.js");
 
-afterEach(() => {
-  vi.restoreAllMocks();
+beforeEach(() => {
+  vi.clearAllMocks();
 });
 
 /******************************************************************************
  * Test data factories
  ******************************************************************************/
 
-function createCourtModel(overrides: Partial<CourtModel> = {}): CourtModel {
-  return {
-    id: 1,
-    name: "Court 1",
-    clubId: 1,
-    surface: "CARPET",
-    indoor: false,
-    ...overrides,
-  };
-}
-
-function createGetCourt(overrides: Partial<GetCourt> = {}): GetCourt {
-  return {
-    id: 1,
-    name: "Court 1",
-    clubId: 1,
-    surface: "CARPET",
-    indoor: true,
-    club: {
-      id: 1,
-      name: "Birmingham Central",
-      addressId: 1,
-    },
-    ...overrides,
-  };
-}
+const CourtListBuilder = CourtBuilder.CourtListBuilder;
+const CourtDetailBuilder = CourtBuilder.CourtDetailBuilder;
 
 const MOCKED_COURTS_FROM_REPO: CourtModel[] = [
-  createCourtModel(),
-  createCourtModel({
-    id: 2,
-    name: "Court 2",
-    clubId: 2,
-    surface: "HARD",
-    indoor: true,
-  }),
+  new CourtListBuilder()
+    .withId(1)
+    .withName("Court 1")
+    .withClubId(1)
+    .withSurface("CARPET")
+    .withIndoor(false)
+    .build(),
+  new CourtListBuilder()
+    .withId(2)
+    .withName("Court 2")
+    .withClubId(2)
+    .withSurface("HARD")
+    .withIndoor(true)
+    .build(),
 ];
 
-const MOCKED_COURT_FROM_REPO: GetCourt = createGetCourt();
+const MOCKED_COURT_FROM_REPO: GetCourt = new CourtDetailBuilder()
+  .withId(1)
+  .withName("Court 1")
+  .withClubId(1)
+  .withSurface("CARPET")
+  .withIndoor(true)
+  .build();
 
 /******************************************************************************
  * Tests
@@ -66,13 +55,14 @@ const MOCKED_COURT_FROM_REPO: GetCourt = createGetCourt();
 describe("CourtService.getAllCourts", () => {
   it("returns courts filtered by clubId", async () => {
     const repoResponse: CourtModel[] = [MOCKED_COURTS_FROM_REPO[0]];
-    const getAllSpy = vi
-      .spyOn(CourtRepo, "getAll")
-      .mockResolvedValue(repoResponse);
+
+    vi.mocked(CourtRepo.getAll).mockResolvedValue(repoResponse);
 
     const result = await CourtService.getAllCourts({ clubId: 1 });
 
-    expect(getAllSpy).toHaveBeenCalledWith({ clubId: 1 });
+    expect(CourtRepo.getAll).toHaveBeenCalledWith({ clubId: 1 });
+    expect(CourtRepo.getAll).toHaveBeenCalledTimes(1);
+
     expect(result).toEqual([
       {
         id: 1,
@@ -85,13 +75,13 @@ describe("CourtService.getAllCourts", () => {
   });
 
   it("returns all courts when no clubId is provided", async () => {
-    const getAllSpy = vi
-      .spyOn(CourtRepo, "getAll")
-      .mockResolvedValue(MOCKED_COURTS_FROM_REPO);
+    vi.mocked(CourtRepo.getAll).mockResolvedValue(MOCKED_COURTS_FROM_REPO);
 
     const result = await CourtService.getAllCourts();
 
-    expect(getAllSpy).toHaveBeenCalledWith({});
+    expect(CourtRepo.getAll).toHaveBeenCalledWith({});
+    expect(CourtRepo.getAll).toHaveBeenCalledTimes(1);
+
     expect(result).toEqual([
       {
         id: 1,
@@ -113,15 +103,15 @@ describe("CourtService.getAllCourts", () => {
 
 describe("CourtService.getCourt", () => {
   it("returns a court DTO when a matching court is found", async () => {
-    const getOneSpy = vi
-      .spyOn(CourtRepo, "getOne")
-      .mockResolvedValue(MOCKED_COURT_FROM_REPO);
+    vi.mocked(CourtRepo.getOne).mockResolvedValue(MOCKED_COURT_FROM_REPO);
 
     const result: GetCourtResponseDTO | null = await CourtService.getCourt({
-      id: 1,
+      courtId: 1,
     });
 
-    expect(getOneSpy).toHaveBeenCalledWith({ id: 1 });
+    expect(CourtRepo.getOne).toHaveBeenCalledWith({ courtId: 1 });
+    expect(CourtRepo.getOne).toHaveBeenCalledTimes(1);
+
     expect(result).toEqual({
       id: 1,
       name: "Court 1",
@@ -132,11 +122,13 @@ describe("CourtService.getCourt", () => {
   });
 
   it("returns null when no matching court is found", async () => {
-    const getOneSpy = vi.spyOn(CourtRepo, "getOne").mockResolvedValue(null);
+    vi.mocked(CourtRepo.getOne).mockResolvedValue(null);
 
-    const result = await CourtService.getCourt({ id: 999 });
+    const result = await CourtService.getCourt({ courtId: 999 });
 
-    expect(getOneSpy).toHaveBeenCalledWith({ id: 999 });
+    expect(CourtRepo.getOne).toHaveBeenCalledWith({ id: 999 });
+    expect(CourtRepo.getOne).toHaveBeenCalledTimes(1);
+
     expect(result).toBeNull();
   });
 });
