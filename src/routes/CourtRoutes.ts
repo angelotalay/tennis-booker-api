@@ -1,8 +1,8 @@
 import type { Request, Response } from "express";
-import CourtService from "@/src/service/CourtService.js";
-import HttpStatusCodes from "@/src/common/constants/HttpStatusCodes.js";
-import type { GetCourtResponseDTO } from "@/src/dto/CourtDTO.js";
-import type { GetCourtParams, GetCourtsQuery } from "@/src/types/CourtTypes.js";
+import CourtService from "@/service/CourtService.js";
+import HttpStatusCodes from "@/common/constants/HttpStatusCodes.js";
+import type { GetCourtResponseDTO } from "@/dto/CourtDTO.js";
+import type { GetCourtParams, GetCourtsQuery } from "@/types/CourtTypes.js";
 
 /******************************************************************************
  Functions

@@ -1,7 +1,7 @@
 import * as z from "zod";
 
 import { Prisma } from "../../generated/prisma/client.js";
-import CourtSchemas from "@/src/validation/CourtSchema.js";
+import CourtSchemas from "@/validation/CourtSchema.js";
 
 /******************************************************************************
  Types

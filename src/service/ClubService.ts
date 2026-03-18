@@ -1,10 +1,11 @@
-import ClubRepo from "@/src/repos/ClubRepo.js";
+import ClubRepo from "@/repos/ClubRepo.js";
 import type {
   GetClubResponseDTO,
   GetClubsResponseDTO,
 } from "../dto/ClubDTO.js";
 
-import type { GetClub, GetClubParams, GetClubs } from "../types/ClubTypes.js";
+import type { GetClub, GetClubParams, GetClubs } from "@/types/ClubTypes.js";
+import type { GetCourt } from "@/types/CourtTypes.js";
 
 /******************************************************************************
  Functions
@@ -34,7 +35,7 @@ export function toGetClubResponseDTO(club: GetClub): GetClubResponseDTO {
       streetName: club.address.streetName,
       postCode: club.address.postCode,
     },
-    courts: club.courts.map((court) => {
+    courts: club.courts.map((court: GetCourt) => {
       return {
         id: court.id,
         name: court.name,

@@ -1,6 +1,6 @@
 import * as z from "zod";
 import type { NextFunction, Request, Response } from "express";
-import HttpStatusCodes from "@/src/common/constants/HttpStatusCodes.js";
+import HttpStatusCodes from "@/common/constants/HttpStatusCodes.js";
 
 /******************************************************************************
  Functions

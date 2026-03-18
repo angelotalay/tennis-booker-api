@@ -1,7 +1,11 @@
 import type { NextFunction, Request, Response } from "express";
 import { z } from "zod";
-import HttpStatusCodes from "@/src/common/constants/HttpStatusCodes.js";
+import HttpStatusCodes from "@/common/constants/HttpStatusCodes.js";
 
+/**
+ * Validation for query parameters. Output query parameters into locals.params.
+ * @param schema - Zod validation schema
+ */
 const validateQuery =
   <S extends z.ZodTypeAny>(schema: S) =>
   (req: Request, res: Response, next: NextFunction) => {

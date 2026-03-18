@@ -6,7 +6,7 @@ import type {
   GetClubResponseDTO,
   GetClubsResponseDTO,
 } from "../dto/ClubDTO.js";
-import type { GetClubParams } from "@/src/types/ClubTypes.js";
+import type { GetClubParams } from "@/types/ClubTypes.js";
 
 /******************************************************************************
  Functions

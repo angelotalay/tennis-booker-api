@@ -1,6 +1,6 @@
-import { Prisma } from "@/generated/prisma/client.js";
+import { Prisma } from "../../generated/prisma/client.js";
 import { z } from "zod";
-import ClubSchema from "@/src/validation/ClubSchema.js";
+import ClubSchema from "@/validation/ClubSchema.js";
 
 /******************************************************************************
  Types
@@ -33,6 +33,3 @@ export type GetClub = Prisma.ClubGetPayload<{
 export type GetClubParams = z.infer<typeof ClubSchema.clubParamsSchema>;
 
 // ----------------------- DTO types --------------------------------- //
-export interface GetClubDTO = {
-  id: number;
-}
